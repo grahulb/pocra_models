@@ -374,13 +374,7 @@ class PocraSMModelSimulation:
 		)
 
 		if weathers is not None:
-			if isinstance(weathers, str) and os.path.exists(weathers):
-				# file option is for raw input from user via a CSV file
-				with open(weathers, newline='') as f:
-					self.weathers = [
-						Weather(**{k: float(v) for k, v in row.items()}) for row in csv.DictReader(f)
-					]
-			elif all(isinstance(weather, Weather) for weather in weathers):
+			if all(isinstance(weather, Weather) for weather in weathers):
 				# <list>-of-<Weather>s option is an API
 				# for the typical case of re-use of same weather conditions
 				# for multiple locations
@@ -504,7 +498,44 @@ class PocraSMModelSimulation:
 		)
 
 
+
 	def run(self):
 		self.computation_before_iteration()
 		self.iterate()
 		self.computation_after_iteration()
+
+
+
+class SimulationIO:
+	"""
+	This class provides input-output facilities
+	to build a <PocraSMModelSimulation> instance.
+	"""
+	
+	@staticmethod
+	def create_weathers_from_csv_file(filepath):
+
+		if os.path.exists(filepath):
+			with open(filepath, newline='') as f:
+				return [
+					Weather(**{k: float(v) for k, v in row.items()}) for row in csv.DictReader(f)
+				]
+	
+
+	@staticmethod
+	def output_water_components_to_csv(psmm, components=[], filepath='results.csv'):
+
+		if (isinstance(psmm, PocraSMModelSimulation)
+			and len(psmm.waters) > 0 and all(isinstance(w, Water) for w in psmm.waters)
+		):
+			rows = [{
+				c: (getattr(psmm.waters[i], c) if hasattr(psmm.waters[i], c)
+					else getattr(psmm.weathers[i], c) if hasattr(psmm.weathers[i], c)
+					else 'No such component found')
+				for c in components
+			} for i in range(len(psmm.weathers))]
+			
+			with open(filepath, 'w', newline='') as f:
+				writer = csv.DictWriter(f, fieldnames=components)
+				writer.writeheader()
+				writer.writerows(rows)

@@ -54,7 +54,7 @@ psmm3 = PocraSMModelSimulation(
 psmm4 = PocraSMModelSimulation(
 	soil_texture='clayey', soil_depth_category='deep (50 to 100 cm)',
 	lulc_type='cropped in two seasons', slope=3,
-	weathers='weathers.csv',
+	weathers=SimulationIO.create_weathers_from_csv_file('weathers.csv'),
 	crop='bajri'
 )
 
@@ -62,20 +62,26 @@ psmm4 = PocraSMModelSimulation(
 
 
 ####### choose the example to run #######
-psmm = psmm1 # psmm1 or psmm2 or ... any other simulation that you may build
+psmm = psmm4 # psmm1 or psmm2 or ... any other simulation that you may build
 
 
 # run the chosen example simulation
 psmm.run()
 
 # check water-component values after running
-print(f'Primary Runoff is : {psmm.pri_runoff}\n\n')
-print(f'Infiltration is : {psmm.infil}\n\n')
-print(f'AET is : {psmm.aet}\n\n')
-print(f'PET is : {psmm.pet}\n\n')
-print(f'Secondary Runoff is : {psmm.sec_runoff}\n\n')
-print(f'GW-recharge is : {psmm.gw_rech}\n\n')
-# check weather components values, if desired
-print(f'Rain is : {psmm.rain}\n\n')
-print(f'ET0 is : {psmm.et0}\n\n')
-print(f'R_a is : {psmm.r_a}\n\n')
+# print(f'Primary Runoff is : {psmm.pri_runoff}\n\n')
+# print(f'Infiltration is : {psmm.infil}\n\n')
+# print(f'AET is : {psmm.aet}\n\n')
+# print(f'PET is : {psmm.pet}\n\n')
+# print(f'Secondary Runoff is : {psmm.sec_runoff}\n\n')
+# print(f'GW-recharge is : {psmm.gw_rech}\n\n')
+# # check weather components values, if desired
+# print(f'Rain is : {psmm.rain}\n\n')
+# print(f'ET0 is : {psmm.et0}\n\n')
+# print(f'R_a is : {psmm.r_a}\n\n')
+
+SimulationIO.output_water_components_to_csv(
+	psmm,
+	components=['pri_runoff', 'avail_sm', 'aet'],
+	filepath='results.csv'
+)
