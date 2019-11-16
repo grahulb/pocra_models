@@ -213,7 +213,7 @@ class Weather:
 	):
 		
 		r_a = r_a or Weather.get_pocra_radiation_for_latitude_for_day(latitude, day_of_year)
-		et0 = 0.0023 * (temp_avg + 17.28) * (temp_max-temp_min) * 0.5 * r_a * 0.408
+		et0 = 0.0023 * (temp_avg + 17.28) * ((temp_max-temp_min)**0.5) * r_a * 0.408
 
 		return r_a, et0
 
@@ -492,10 +492,7 @@ class PocraSMModelSimulation:
 	
 	def computation_after_iteration(self):
 		
-		self.crop_end_index = min(
-			self.sowing_date_offset + len(self.crop.kc),
-			self.simulation_length - 1
-		)
+		self.crop_end_index = min(self.sowing_date_offset + len(self.crop.kc), 364)
 
 
 
